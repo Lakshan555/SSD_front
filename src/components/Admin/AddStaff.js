@@ -33,8 +33,7 @@ const AddStaff = () => {
       ...staffData
     });
     console.log(response.data)
-    // const res = await axios.post(`${BASE_URL}/staff/add`, { staffData });
-    // if (res.status === 200) window.location.reload();
+   
   };
   const userTypes = [
     { name: "Manager", value: "manager" },
