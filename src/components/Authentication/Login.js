@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Grid, Link } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -9,21 +9,38 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextFieldComponent from "./TextFieldComponent";
+import axios from "axios";
+import { BASE_URL } from "../../constant";
 
 const theme = createTheme();
 const Login = () => {
-  const [values, setValues] = React.useState({
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value });
-  };
+  const [nic, setNic] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(values);
+    console.log(nic, password);
+  };
+
+  const onLoginPress = async () => {
+    const response = await axios.post(`${BASE_URL}users/login`, {
+      NIC: nic,
+      password,
+    });
+
+    console.log(response.data);
+
+    if (response.data.isSuccessful) {
+       localStorage.setItem("userToken", response.data.token);
+       localStorage.setItem("user", JSON.stringify(response.data.user));
+      if(response.data.user.role === 'admin'){
+        window.location = "/viewStaff";
+      }
+      else{
+        window.location = "/mDashboard";
+      }
+    }
+    alert(response.data.message);
   };
 
   return (
@@ -53,12 +70,12 @@ const Login = () => {
             <form onSubmit={handleSubmit}>
               <Box sx={{ mt: 1 }}>
                 <TextFieldComponent
-                  label="Email Address"
-                  inputName="email"
+                  label="NIC"
+                  inputName="nic"
                   classes="form-field"
                   required
-                  inputValue={values.email}
-                  // handleChange={handleChange("email")}
+                  inputValue={nic}
+                  onChange={(e) => setNic(e.target.value)}
                 />
                 <TextFieldComponent
                   label="Password"
@@ -66,11 +83,12 @@ const Login = () => {
                   type="password"
                   classes="form-field"
                   required
-                  inputValue={values.password}
-                  // handleChange={handleChange("password")}
+                  inputValue={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
 
                 <Button
+                  onClick={onLoginPress}
                   type="submit"
                   fullWidth
                   variant="contained"
@@ -78,7 +96,6 @@ const Login = () => {
                 >
                   Sign In
                 </Button>
-               
               </Box>
             </form>
           </Box>

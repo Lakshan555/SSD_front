@@ -8,7 +8,7 @@ const TextFieldComponent = ({
   type,
   inputValue,
   label,
-  handleChange,
+  onChange,
 }) => {
   return (
     <TextField
@@ -20,7 +20,7 @@ const TextFieldComponent = ({
       label={label}
       name={inputName}
       value={inputValue}
-      onChange={handleChange}
+      onChange={onChange}
       type={type}
       autoComplete="false"
       sx={{

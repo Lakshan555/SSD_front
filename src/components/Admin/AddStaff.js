@@ -10,29 +10,35 @@ import { Box } from "@mui/system";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import TextFieldComponent from "../Common/TextFieldComponent";
 import DropDown from "../Common/DropDown";
+import axios from "axios";
+import { BASE_URL } from "../../constant";
 
 const AddStaff = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [nic, setNic] = useState("");
-  const [role, setRole] = useState("");
+  // const [role, setRole] = useState("");
   const [userType, setUserType] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const staffData = {
-        sName: name,
-        nic: nic,
-        password: password,
-        role: role,
+      name: name,
+      NIC: nic,
+      password: password,
+      role: userType,
     };
 
+    const response = await axios.post(`${BASE_URL}users/register`, {
+      ...staffData
+    });
+    console.log(response.data)
     // const res = await axios.post(`${BASE_URL}/staff/add`, { staffData });
     // if (res.status === 200) window.location.reload();
   };
   const userTypes = [
-    { name: "Manager", value: "1" },
-    { name: "Worker", value: "2" },
+    { name: "Manager", value: "manager" },
+    { name: "Worker", value: "worker" },
   ];
 
   const userTypeHandler = (event) => {
@@ -56,7 +62,6 @@ const AddStaff = () => {
           <h2>Add Staff details</h2>
 
           <form onSubmit={onSubmit}>
-    
             <TextFieldComponent
               label="Name"
               name="name"
@@ -75,7 +80,7 @@ const AddStaff = () => {
               handleChange={(e) => setNic(e.target.value)}
               inputValue={nic}
             />
-                <TextFieldComponent
+            <TextFieldComponent
               label="Password"
               name="password"
               classes="form-field"
