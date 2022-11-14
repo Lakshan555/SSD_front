@@ -6,11 +6,13 @@ import Dashboard from "./components/Manager/Dashboard";
 import Navbar from "./components/NavBar/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
+const user = JSON.parse(localStorage.getItem("user"));
+
 
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+      {user ? <Navbar /> : null}
       <Routes>
         {/* Private routes */}
         <Route path="/" element={<PrivateRoute />}>

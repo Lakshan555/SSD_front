@@ -1,4 +1,4 @@
-import { Grid, Link, Card, Stack, Button } from "@mui/material";
+import { Grid, Link, Card, Stack, Button, Alert, Snackbar } from "@mui/material";
 import TextFieldComponent from "../Common/TextFieldComponent";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -37,28 +37,45 @@ const staffData = [{ sid: "ID100" }, { sid: "ID100" }];
 
 //get user data
 const user = JSON.parse(localStorage.getItem("user"));
-console.log(user.role);
-
-
+// console.log(user.role);
 
 
 const Dashboard = () => {
 
   const [message, setMessage] = useState("");
   const [file, setFile] = useState("");
+  const [open, setOpen] = useState(false);
+  const [show, setShow] = useState(false);
+  const [showMessage, setShowMessage] = useState('');
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const messageData = {
-      message:message,
-      uploadFile:file
-    };
-  
-    const response = await axios.post(`${BASE_URL}messages`, {
-      ...messageData
-    });
-    console.log(response.data)
-   
+    try {
+
+      const messageData = {
+        staffId: user._id,
+        message: message,
+        uploadFile: file
+      };
+      console.log('file ', file)
+      const response = await axios.post(`${BASE_URL}messages`, { ...messageData }, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      setOpen(!open);
+      setShowMessage(response.data)
+      setTimeout(() => {
+        setOpen(false); setMessage('');
+      }, 2000)
+      console.log('user response ', response)
+    } catch (error) {
+      setShow(!show);
+      setShowMessage(error.response.data);
+      setTimeout(() => {
+        setShow(false); setMessage('');
+      }, 2000)
+      // alert(error.response.data)
+    }
+
   };
   return (
     <Grid m={2}>
@@ -68,38 +85,44 @@ const Dashboard = () => {
             <Grid textAlign="center" sx={{ background: "green" }}>
               Add Message
             </Grid>
+            <Grid textAlign="center">
+              <Snackbar open={open} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+                <Alert severity="success">{showMessage}!</Alert>
+              </Snackbar>
+              <Snackbar open={show} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+                <Alert severity="error">{showMessage}!</Alert>
+              </Snackbar>
+              {/* <Alert severity="success" sx={{ m: 2 }}>This is a success alert — check it out!</Alert> */}
+            </Grid>
             <Grid sx={{ background: "grey" }}>
               <Grid p={5}>
-              <form onSubmit={onSubmit} enctype="multipart/form-data">
-                <TextFieldComponent
-                  label="Message"
-                  name="message"
-                  classes="form-field"
-                  width="100%"
-                  required
-                  handleChange={(e) => setMessage(e.target.value)}
-                  inputValue={message}
-                />
-                {user.role === "worker" && (
+                <form onSubmit={onSubmit} enctype="multipart/form-data">
                   <TextFieldComponent
-          
-                    name="file"
+                    label="Message"
+                    name="message"
                     classes="form-field"
                     width="100%"
-                    type='file'
                     required
-                    handleChange={(e) => setFile(e.target.files[0])}
-                   
+                    handleChange={(e) => setMessage(e.target.value)}
+                    inputValue={message}
                   />
-                )}
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Submit
-                </Button>
+                  {user.role === "worker" && (
+                    <TextFieldComponent
+                      type='file'
+                      name="fileUpload"
+                      classes="form-field"
+                      width="100%"
+                      handleChange={(e) => { setFile(e.target.files[0]) }}
+                    />
+                  )}
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Submit
+                  </Button>
                 </form>
               </Grid>
             </Grid>

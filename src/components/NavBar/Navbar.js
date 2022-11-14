@@ -110,13 +110,19 @@ const Navbar = ({ toggle }) => {
   //   }
   // }
 
+  const logout = () => {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('user');
+    window.location = "/"
+  }
+
   return (
     <>
       <IconContext.Provider value={{ color: "#fff" }}>
         <Nav scrollNav={scrollNav}>
           <NavbarContainer>
             <NavLinks
-              onClick={() => (window.location = "/")}
+              onClick={() => logout()}
               smooth={true}
               duration={500}
               spy={true}
