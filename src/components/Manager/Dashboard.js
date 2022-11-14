@@ -9,7 +9,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { tableCellClasses } from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BASE_URL } from "../../constant";
 import axios from "axios";
 
@@ -42,11 +42,22 @@ const user = JSON.parse(localStorage.getItem("user"));
 
 const Dashboard = () => {
 
+  const [userMessages, setUserMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [file, setFile] = useState("");
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [showMessage, setShowMessage] = useState('');
+
+
+  const fetchData = async () => {
+    const response = await axios.get(`${BASE_URL}messages`);
+    setUserMessages(response.data);
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData])
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -55,7 +66,7 @@ const Dashboard = () => {
       const messageData = {
         staffId: user._id,
         message: message,
-        uploadFile: file
+        uploadFile: file ? file : null
       };
       console.log('file ', file)
       const response = await axios.post(`${BASE_URL}messages`, { ...messageData }, {
@@ -102,7 +113,6 @@ const Dashboard = () => {
                     name="message"
                     classes="form-field"
                     width="100%"
-                    required
                     handleChange={(e) => setMessage(e.target.value)}
                     inputValue={message}
                   />
@@ -140,10 +150,10 @@ const Dashboard = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {staffData.map((row) => (
-                  <StyledTableRow key={row._id}>
+                {userMessages.length && userMessages.map((row, index) => (
+                  <StyledTableRow key={index}>
                     <StyledTableCell component="th" scope="row">
-                      {row.sid}
+                      {row.message}
                     </StyledTableCell>
                   </StyledTableRow>
                 ))}
@@ -162,12 +172,14 @@ const Dashboard = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {staffData.map((row) => (
-                  <StyledTableRow key={row._id}>
-                    <StyledTableCell component="th" scope="row">
-                      {row.sid}
-                    </StyledTableCell>
-                  </StyledTableRow>
+                {userMessages.length && userMessages.map((row, index) => (
+                  row.uploadFile ?
+                    <StyledTableRow key={index}>
+                      <StyledTableCell component="th" scope="row">
+                        {row.uploadFile}
+                      </StyledTableCell>
+                    </StyledTableRow>
+                    : null
                 ))}
               </TableBody>
             </Table>

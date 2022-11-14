@@ -15,7 +15,6 @@ const TextFieldComponent = ({
   return (
     <TextField
       margin="normal"
-      required
       id={id}
       className={classes}
       label={label}
